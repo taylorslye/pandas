@@ -21,7 +21,7 @@ Development
     debugging_extensions
     extending
     developer
-    code of conduct
+    code_of_conduct
     policies
     roadmap
     meeting
