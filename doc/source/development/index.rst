@@ -24,4 +24,4 @@ Development
     code_of_conduct
     policies
     roadmap
-    meeting
+    community

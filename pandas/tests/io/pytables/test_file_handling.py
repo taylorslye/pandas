@@ -22,7 +22,7 @@ from pandas.tests.io.pytables.common import (
     tables,
 )
 
-from pandas.io import pytables as pytables
+from pandas.io import pytables
 from pandas.io.pytables import Term
 
 pytestmark = pytest.mark.single_cpu
@@ -41,9 +41,8 @@ def test_mode(setup_path, tmp_path, mode):
             HDFStore(path, mode=mode)
 
     else:
-        store = HDFStore(path, mode=mode)
-        assert store._handle.mode == mode
-        store.close()
+        with HDFStore(path, mode=mode) as store:
+            assert store._handle.mode == mode
 
     path = tmp_path / setup_path
 
@@ -253,16 +252,14 @@ def test_complibs(tmp_path, setup_path):
         result = read_hdf(tmpfile, gname)
         tm.assert_frame_equal(result, df)
 
-        # Open file and check metadata
-        # for correct amount of compression
-        h5table = tables.open_file(tmpfile, mode="r")
-        for node in h5table.walk_nodes(where="/" + gname, classname="Leaf"):
-            assert node.filters.complevel == lvl
-            if lvl == 0:
-                assert node.filters.complib is None
-            else:
-                assert node.filters.complib == lib
-        h5table.close()
+        # Open file and check metadata for correct amount of compression
+        with tables.open_file(tmpfile, mode="r") as h5table:
+            for node in h5table.walk_nodes(where="/" + gname, classname="Leaf"):
+                assert node.filters.complevel == lvl
+                if lvl == 0:
+                    assert node.filters.complib is None
+                else:
+                    assert node.filters.complib == lib
 
 
 @pytest.mark.skipif(
